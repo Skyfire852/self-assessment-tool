@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Manager Skills Self-Assessment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        legend {
+            font-weight: bold;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #chartContainer {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Manager Skills Self-Assessment</h1>
+    <form id="assessmentForm">
+        <fieldset>
+            <legend>Personal Information</legend>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="jobTitle">Job Title:</label>
+            <input type="text" id="jobTitle" name="jobTitle" required>
+
+            <label for="team">Team:</label>
+            <input type="text" id="team" name="team" required>
+        </fieldset>
+
+        <!-- Rest of the form fields remain the same -->
+        <!-- ... -->
+
+        <button type="submit">Submit Assessment</button>
+    </form>
+
+    <div id="chartContainer">
+        <canvas id="skillsChart"></canvas>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        const form = document.getElementById('assessmentForm');
+        const ctx = document.getElementById('skillsChart').getContext('2d');
+        const messageDiv = document.getElementById('message');
+        let chart;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const skills = Array.from(formData.entries()).map(entry => ({
+                skill: entry[0],
+                rating: entry[1]
+            }));
+
+            // Generate chart
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                // Chart configuration remains the same
+                // ...
+            });
+
+            // Submit data to Google Sheet
+            const data = Object.fromEntries(formData);
+            submitToGoogleSheet(data);
+        });
+
+        function submitToGoogleSheet(data) {
+            // Replace with your Google Apps Script Web App URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzrU1tBtaM4XcimvGp6kjSw7_kr8m7sCSZYvLgn2AKFUIG-RuP3pUbxoQBRzagD_6cu/exec';
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.result === 'success') {
+                    messageDiv.textContent = 'Assessment submitted successfully!';
+                    messageDiv.className = 'success';
+                } else {
+                    throw new Error('Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messageDiv.textContent = 'An error occurred. Please try again.';
+                messageDiv.className = 'error';
+            });
+        }
+    </script>
+</body>
+</html>
+
